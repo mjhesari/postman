@@ -143,6 +143,11 @@ export function CollectionsPanel() {
         </div>
       </div>
 
+      <ImportExportDialog 
+        open={isImportExportOpen} 
+        onOpenChange={setIsImportExportOpen} 
+      />
+
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {collections.length === 0 && (
@@ -221,11 +226,6 @@ export function CollectionsPanel() {
           ))}
         </div>
       </ScrollArea>
-
-      <ImportExportDialog 
-        open={isImportExportOpen} 
-        onOpenChange={setIsImportExportOpen} 
-      />
     </div>
   );
 }
