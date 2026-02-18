@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, FolderPlus, FileText, Trash2, Edit2, ChevronRight } from 'lucide-react';
+import { Plus, FolderPlus, FileText, Trash2, Edit2, ChevronRight, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -33,12 +33,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { ImportExportDialog } from './import-export-dialog';
 
 export function CollectionsPanel() {
   const { collections, addCollection, deleteCollection, getRequest } = useCollectionsStore();
   const { loadRequest } = useRequestStore();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionDesc, setNewCollectionDesc] = useState('');
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
@@ -87,12 +89,22 @@ export function CollectionsPanel() {
     <div className="flex flex-col h-full">
       <div className="p-4 border-b flex items-center justify-between">
         <h2 className="font-semibold">Collections</h2>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-1">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-8 w-8 p-0"
+            onClick={() => setIsImportExportOpen(true)}
+            title="Import/Export"
+          >
+            <FileUp className="h-4 w-4" />
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create Collection</DialogTitle>
@@ -208,6 +220,11 @@ export function CollectionsPanel() {
           ))}
         </div>
       </ScrollArea>
+
+      <ImportExportDialog 
+        open={isImportExportOpen} 
+        onOpenChange={setIsImportExportOpen} 
+      />
     </div>
   );
 }
