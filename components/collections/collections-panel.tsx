@@ -140,6 +140,7 @@ export function CollectionsPanel() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <ScrollArea className="flex-1">
