@@ -32,7 +32,7 @@ export function ImportExportDialog({
 }: ImportExportDialogProps) {
   const [activeTab, setActiveTab] = useState('import')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { collections, addCollection } = useCollectionsStore()
+  const { collections, importCollection } = useCollectionsStore()
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -48,7 +48,7 @@ export function ImportExportDialog({
       }
 
       const collection = importPostmanCollection(json)
-      addCollection(collection)
+      importCollection(collection)
       
       toast.success(`Collection "${collection.name}" imported successfully`)
       onOpenChange(false)

@@ -9,6 +9,7 @@ interface CollectionsState {
   
   // Collection Actions
   addCollection: (name: string, description?: string) => string;
+  importCollection: (collection: Collection) => void;
   updateCollection: (id: string, updates: Partial<Collection>) => void;
   deleteCollection: (id: string) => void;
   
@@ -49,6 +50,21 @@ export const useCollectionsStore = create<CollectionsState>()(
           ],
         }));
         return id;
+      },
+      
+      importCollection: (collection) => {
+        set((state) => ({
+          collections: [
+            ...state.collections,
+            {
+              ...collection,
+              // Ensure the imported collection has a unique ID
+              id: nanoid(),
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            },
+          ],
+        }));
       },
       
       updateCollection: (id, updates) =>
