@@ -5,7 +5,13 @@ import type { Collection, HttpRequest, Folder } from '@/types'
 interface PostmanRequest {
   method: string
   header?: Array<{ key: string; value: string; disabled?: boolean }>
-  url?: string | { raw: string; host?: string[]; path?: string[] }
+  url?: string | { 
+    raw?: string
+    host?: string[]
+    path?: string[]
+    query?: Array<{ key: string; value: string; disabled?: boolean }>
+    variable?: Array<{ key: string; value: string }>
+  }
   body?: {
     mode: string
     raw?: string
@@ -76,9 +82,37 @@ export function importPostmanCollection(postmanJson: PostmanCollection): Collect
 
         if (!request) continue
 
-        const url = typeof request.url === 'string' 
-          ? request.url 
-          : request.url?.raw || ''
+        // Parse URL and query parameters
+        let url = ''
+        const params: HttpRequest['params'] = []
+        
+        if (typeof request.url === 'string') {
+          url = request.url
+        } else if (request.url) {
+          // Use raw URL if available
+          url = request.url.raw || ''
+          
+          // Parse query parameters from Postman format
+          if (request.url.query && request.url.query.length > 0) {
+            params.push(...request.url.query.map((q) => ({
+              id: nanoid(),
+              key: q.key,
+              value: q.value,
+              enabled: !q.disabled,
+            })))
+          }
+          
+          // If no raw URL, construct from parts
+          if (!url && request.url.host && request.url.path) {
+            const host = Array.isArray(request.url.host) 
+              ? request.url.host.join('.') 
+              : request.url.host
+            const path = Array.isArray(request.url.path) 
+              ? '/' + request.url.path.join('/') 
+              : request.url.path
+            url = `${host}${path}`
+          }
+        }
 
         // Parse headers
         const headers = (request.header || []).map((h) => ({
@@ -158,7 +192,7 @@ export function importPostmanCollection(postmanJson: PostmanCollection): Collect
           method: (request.method || 'GET') as HttpRequest['method'],
           url,
           headers,
-          params: [],
+          params,
           body: {
             type: bodyType,
             content: bodyContent,
@@ -301,10 +335,22 @@ function convertRequestToPostman(request: HttpRequest): PostmanItem {
     }
   }
 
+  // Convert query parameters if exists
+  const query = request.params.length > 0
+    ? request.params.map((p) => ({
+        key: p.key,
+        value: p.value,
+        disabled: !p.enabled,
+      }))
+    : undefined
+
   const postmanRequest: PostmanRequest = {
     method: request.method,
     header: headers.length > 0 ? headers : undefined,
-    url: request.url,
+    url: query ? {
+      raw: request.url,
+      query,
+    } : request.url,
     body,
     auth,
   }
