@@ -73,7 +73,11 @@ export function importPostmanCollection(postmanJson: PostmanCollection): Collect
           requests: nestedItems.requests,
         })
         
+        // Add all nested folders to the flat folders array
         folders.push(...nestedItems.folders)
+        
+        // Add all nested requests to the requests array so they appear in collection
+        requests.push(...nestedItems.requests)
       } else {
         // It's a request
         const request = typeof item.request === 'string' 

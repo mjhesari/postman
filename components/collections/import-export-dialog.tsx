@@ -38,36 +38,22 @@ export function ImportExportDialog({
     const file = event.target.files?.[0]
     if (!file) return
 
-    console.log('[v0] Starting import, file:', file.name)
-
     try {
       const text = await file.text()
-      console.log('[v0] File read successfully, length:', text.length)
-      
       const json = JSON.parse(text)
-      console.log('[v0] JSON parsed successfully, collection name:', json?.info?.name)
 
       if (!validatePostmanCollection(json)) {
-        console.log('[v0] Validation failed')
         toast.error('Invalid Postman collection format')
         return
       }
 
-      console.log('[v0] Validation passed, converting...')
       const collection = importPostmanCollection(json)
-      console.log('[v0] Converted collection:', {
-        name: collection.name,
-        requestsCount: collection.requests.length,
-        foldersCount: collection.folders.length,
-      })
-      
       importCollection(collection)
-      console.log('[v0] Collection imported to store')
       
-      toast.success(`Collection "${collection.name}" imported successfully`)
+      toast.success(`Collection "${collection.name}" imported successfully with ${collection.requests.length} requests`)
       onOpenChange(false)
     } catch (error) {
-      console.error('[v0] Import error:', error)
+      console.error('Import error:', error)
       toast.error('Failed to import collection. Please check the file format.')
     } finally {
       // Reset file input
