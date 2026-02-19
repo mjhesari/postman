@@ -2,7 +2,7 @@
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { VariableAutocompleteTextarea } from '@/components/ui/variable-autocomplete-textarea';
 import { KeyValueEditor } from '@/components/ui/key-value-editor';
 import { useRequestStore } from '@/store/use-request-store';
 import { Button } from '@/components/ui/button';
@@ -83,11 +83,12 @@ export function BodyEditor() {
               Format JSON
             </Button>
           </div>
-          <Textarea
+          <VariableAutocompleteTextarea
             value={currentRequest.body.content as string}
-            onChange={(e) => setBodyContent(e.target.value)}
+            onChange={setBodyContent}
             placeholder={'{\n  "key": "value"\n}'}
-            className="font-mono text-sm min-h-[300px] resize-y"
+            className="font-mono text-sm resize-y"
+            rows={15}
           />
         </div>
       )}
@@ -121,11 +122,12 @@ export function BodyEditor() {
       {currentRequest.body.type === 'raw' && (
         <div className="space-y-2">
           <Label>Raw Body</Label>
-          <Textarea
+          <VariableAutocompleteTextarea
             value={currentRequest.body.content as string}
-            onChange={(e) => setBodyContent(e.target.value)}
+            onChange={setBodyContent}
             placeholder="Enter raw body content..."
-            className="font-mono text-sm min-h-[300px] resize-y"
+            className="font-mono text-sm resize-y"
+            rows={15}
           />
         </div>
       )}

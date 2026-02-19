@@ -24,11 +24,40 @@ interface EnvironmentsState {
   getActiveVariables: () => Record<string, string>;
 }
 
+const defaultEnvironment: Environment = {
+  id: 'default-env',
+  name: 'Development',
+  isActive: true,
+  variables: [
+    {
+      id: nanoid(),
+      key: 'baseUrl',
+      value: 'https://api.example.com',
+      enabled: true,
+      type: 'default',
+    },
+    {
+      id: nanoid(),
+      key: 'apiKey',
+      value: 'your-api-key-here',
+      enabled: true,
+      type: 'secret',
+    },
+    {
+      id: nanoid(),
+      key: 'version',
+      value: 'v1',
+      enabled: true,
+      type: 'default',
+    },
+  ],
+};
+
 export const useEnvironmentsStore = create<EnvironmentsState>()(
   persist(
     (set, get) => ({
-      environments: [],
-      activeEnvironmentId: null,
+      environments: [defaultEnvironment],
+      activeEnvironmentId: 'default-env',
       
       addEnvironment: (name) => {
         const id = nanoid();

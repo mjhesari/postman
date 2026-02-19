@@ -2,7 +2,7 @@
 
 import { Send, Loader2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { VariableAutocompleteInput } from '@/components/ui/variable-autocomplete-input';
 import {
   Select,
   SelectContent,
@@ -94,16 +94,11 @@ export function URLBar() {
         </SelectContent>
       </Select>
 
-      <Input
-        placeholder="Enter request URL"
+      <VariableAutocompleteInput
+        placeholder="Enter request URL (use {{variableName}} for environment variables)"
         value={currentRequest.url}
-        onChange={(e) => setUrl(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !isLoading) {
-            handleSend();
-          }
-        }}
-        className="flex-1 font-mono text-sm"
+        onChange={setUrl}
+        className="font-mono text-sm"
       />
 
       <Button

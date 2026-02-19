@@ -4,6 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Button } from './button';
 import { Input } from './input';
 import { Checkbox } from './checkbox';
+import { VariableAutocompleteInput } from './variable-autocomplete-input';
 import type { KeyValue } from '@/types';
 
 interface KeyValueEditorProps {
@@ -50,10 +51,10 @@ export function KeyValueEditor({
               onChange={(e) => onUpdate(item.id, { key: e.target.value })}
               className="h-9"
             />
-            <Input
+            <VariableAutocompleteInput
               placeholder={placeholder.value}
               value={item.value}
-              onChange={(e) => onUpdate(item.id, { value: e.target.value })}
+              onChange={(value) => onUpdate(item.id, { value })}
               className="h-9"
             />
             <Button
