@@ -101,26 +101,66 @@ export async function sendHttpRequest(
       headers.set(key, value);
     }
 
-    // 6. Send request
-    const response = await fetch(url.toString(), {
-      method: request.method,
-      headers,
-      body: body as BodyInit | null,
+    // 6. Send request via proxy (bypasses CORS)
+    const headersObj: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      headersObj[key] = value;
     });
+
+    let proxyBody: string | FormDataItem[] | null = null;
+    let bodyType: 'json' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'none' =
+      'none';
+    if (body !== null) {
+      if (request.body.type === 'form-data') {
+        proxyBody = request.body.content as FormDataItem[];
+        bodyType = 'form-data';
+      } else {
+        proxyBody = body as string;
+        bodyType =
+          request.body.type === 'json'
+            ? 'json'
+            : request.body.type === 'x-www-form-urlencoded'
+              ? 'x-www-form-urlencoded'
+              : 'raw';
+      }
+    }
+
+    const proxyResponse = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: request.method,
+        url: url.toString(),
+        headers: headersObj,
+        body: proxyBody,
+        bodyType,
+      }),
+    });
+
+    if (!proxyResponse.ok) {
+      const errData = await proxyResponse.json().catch(() => ({}));
+      throw new Error(
+        errData.error || `Proxy error: ${proxyResponse.status}`
+      );
+    }
+
+    const proxyData = await proxyResponse.json();
+    const response = {
+      status: proxyData.status,
+      statusText: proxyData.statusText,
+      headers: proxyData.headers || {},
+      body: proxyData.body,
+    };
 
     const endTime = performance.now();
 
-    // 7. Parse response
-    const responseBody = await response.text();
-    const responseHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      responseHeaders[key] = value;
-    });
-
+    // 7. Return response (already parsed from proxy)
+    const responseBody =
+      typeof response.body === 'string' ? response.body : String(response.body);
     return {
       status: response.status,
       statusText: response.statusText,
-      headers: responseHeaders,
+      headers: response.headers || {},
       body: responseBody,
       time: Math.round(endTime - startTime),
       size: new Blob([responseBody]).size,
